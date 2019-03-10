@@ -106,7 +106,8 @@ def preobrazovat(event):
                             else:
                                 data[line][2] = hex_tag.upper()
                     if data[line][2] == hex_tag.upper() or data[line][2] == (hex_tag.upper() + ','):
-                        data[line].append(str(' ' * (26 - len(' '.join(data[line]))) + '; Пользовательское ОЗУ'))
+                        data[line].append(
+                            str(' ' * (26 - len(' '.join(data[line]))) + '; Пользовательское ОЗУ'))
                         b, data[line][2], register_new = fix_ram(
                             data, line, general_ram, b, 'G.RAM')
                         if register_new:
@@ -117,6 +118,13 @@ def preobrazovat(event):
                         data, line, common_ram, c, 'C.RAM')
                     if register_new:
                         common_ram.append(register_new)
+            elif 'MOVLW' in data[line]:
+                binar = str(bin(int(str(data[line][2]), 16))[2:])
+                if len(binar) != 8:
+                    binar = '0' * (8 - len(binar)) + binar
+                comment_movlw = data[line][2]
+                data[line][2] = 'b\'' + binar + \
+                    '\'' + '        ; ' + comment_movlw
 
         sort_goto = list(set(goto))
         for a in range(len(sort_goto)):
@@ -137,15 +145,6 @@ def preobrazovat(event):
 
         for a in range(len(sort_goto)):
             sort_goto[a] = sort_goto[a].upper()
-
-        for line in range(len(data)):
-            if 'MOVLW' in data[line]:
-                binar = str(bin(int(str(data[line][2]), 16))[2:])
-                if len(binar) != 8:
-                    binar = '0' * (8 - len(binar)) + binar
-                comment_movlw = data[line][2]
-                data[line][2] = 'b\'' + binar + \
-                    '\'' + '        ; ' + comment_movlw
 
         for i in range(2, len(data)):
             change_address = data[i][0]
