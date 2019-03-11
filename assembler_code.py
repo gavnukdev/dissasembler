@@ -182,11 +182,11 @@ def preobrazovat(event):
     {2}
     Errorlevel  -219, -302, -306 
 ;================================================'''.format(name_lib.upper()[1:-4], name_lib.upper()[:-4], conf)]
-        common_ram[0:0] = [['    COMMON RAM'], [
+        common_ram[0:0] = [[';  COMMON RAM'], [
             ';================================================']]
         common_ram.append(
             [';================================================'])
-        general_ram[0:0] = [['    GENERAL RAM'], [
+        general_ram[0:0] = [['; GENERAL RAM'], [
             ';================================================']]
         general_ram.append(
             [';================================================'])

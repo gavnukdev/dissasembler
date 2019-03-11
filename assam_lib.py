@@ -84,30 +84,20 @@ def address_search(data, line, movlp):
 def fix_ram(data, line, register_ram, counter, wich_is_ram):
     register_add = False
     in_general = 'None'
+    bool_g_ram = False
     if len(register_ram) != 0:
-        bool_g_ram = False
         for i in register_ram:
-            if ','not in data[line][2]:
+            if ',' not in data[line][2]:
                 if data[line][2] in i:
                     in_general = i[0][2:]
                     bool_g_ram = True
             else:
                 if data[line][2][:-1] in i:
-                    in_general = i[0][2:]
+                    in_general = str(i[0][2:] + ',')
+                    print(in_general)
                     bool_g_ram = True
-        if bool_g_ram == False:
-            if ','not in data[line][2]:
-                register_add = ['  {}_{}'.format(
-                    wich_is_ram, counter), 'EQU', data[line][2]]
-                in_general = '{}_{}'.format(wich_is_ram, counter)
-                counter += 1
-            else:
-                register_add = ['  {}_{}'.format(
-                    wich_is_ram, counter), 'EQU', data[line][2][:-1]]
-                in_general = '{}_{},'.format(wich_is_ram, counter)
-                counter += 1
-    elif len(register_ram) == 0:
-        if ','not in data[line][2]:
+    if bool_g_ram == False:
+        if ',' not in data[line][2]:
             register_add = ['  {}_{}'.format(
                 wich_is_ram, counter), 'EQU', data[line][2]]
             in_general = '{}_{}'.format(wich_is_ram, counter)
