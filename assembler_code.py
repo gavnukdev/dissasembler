@@ -17,6 +17,11 @@ def openfilelib(event):
     path_file_lib = filedialog.askopenfilename()
     return path_file_lib
 
+def openfile_lkr(event):
+    global path_file_lkr
+    path_file_lkr = filedialog.askopenfilename()
+    return path_file_lkr
+
 
 def preobrazovat(event):
     global GOTO_INDEX, goto_address, goto, probar
@@ -37,14 +42,23 @@ def preobrazovat(event):
         common_ram = []
         b = 0
         c = 0
-        movlp = '0'
-        probar['maximum'] = len(data)
+        movlp = '000'
+        movlb = '00000'
         probar['value'] = 0
+        if old_new.get():
+            for i in range(len(data)):
+                data[i][0] = '0' + str(data[i][0])
+                if len(data[i + 1]) == 1 and i > 10:
+                    end_list = data.index(data[i])
+                    data = data[:end_list]
+                    break
+        probar['maximum'] = len(data)
 
         for line in range(len(data)):
             probar['value'] = line
             probar.update()
-            movlp = movlp_2048(data, line, movlp)
+            movlp = movlp_2048(data, line, movlp, size_page=lkr(path_file_lkr), old_new=old_new.get())
+            movlb = movlb_calc(data, line, movlb, old_new=old_new.get())
 
             if len(list(set(['RETURN', 'RETFIE', 'RETLW']) & set(data[line]))) != 0:
                 movlp = movlp_sort(data, line)
@@ -59,7 +73,6 @@ def preobrazovat(event):
                 if len(list(set(['BTFSS', 'BTFSC', 'DECFSZ', 'INCFSZ']) & set(data[line - 1]))) == 0:
 
                     movlp = movlp_sort(data, line)
-
             elif 'CALL' in data[line]:
                 address = address_search(data, line, movlp)
                 comment_call = data[line][2]
@@ -67,16 +80,20 @@ def preobrazovat(event):
                 data[line].extend(['             ;', comment_call])
                 goto.append(address)
 
-            elif 'MOVLB' in data[line]:
-                movlb = int(str(data[line][2]), 16) * 128
-
-            elif len(list(set(['CLRF', 'MOVWF', 'BCF', 'BSF', 'BTFSC', 'BTFSS', 'DECFSZ', 'INCFSZ', 'MOVF']) & set(data[line]))) != 0:
+            elif len(list(set(['CLRF',
+                               'MOVWF',
+                               'BCF', 
+                               'BSF', 
+                               'BTFSC', 
+                               'BTFSS', 
+                               'DECFSZ', 
+                               'INCFSZ', 
+                               'MOVF']) & set(data[line]))) != 0 and len(data[line]) >= 3:
                 rename_bool = True
                 if ',' in data[line][2]:
                     coma = True
                     hex_tag = str(
                         hex(int(data[line][2].replace(',', ''), 16) + movlb))
-
                     if (int(data[line][2].replace(',', ''), 16) + movlb) in range(int('0x70', 16), int('0x7F', 16)):
                         rename_bool = False
                 else:
@@ -148,18 +165,15 @@ def preobrazovat(event):
 
         for i in range(2, len(data)):
             change_address = data[i][0]
-            if '*' not in data[i][0]:
-
+            if '*' not in data[i][0] and len(data[i][0]) > 1:
                 data[i][0] = 'L_' + change_address
-
                 if data[i][0] not in sort_goto:
                     data[i][0] = ' ' * 6
-
                 else:
                     data[i][0] += '\n'
                     data[i][1] = ' ' * 6 + data[i][1]
 
-        for page in range(2050, len(data), 2049):
+        for page in range(lkr(path_file_lkr) + 2, len(data), lkr(path_file_lkr) + 1):
             data.insert(page, [
                         ';=======================================\n'+str('ORG 0x' + data[page][0][2:])])
 
@@ -177,7 +191,7 @@ def preobrazovat(event):
     __CONFIG    _CONFIG2, {1}h'''.format(str(config_enter1.get()).upper(), str(config_enter2.get()).upper())
         else:
             conf = '''__CONFIG {0}h'''.format(str(config_enter1.get()).upper())
-        data[0] = ['''  LIST P={0}              
+        data[0] = ['''    LIST P={0}              
     #include <{1}.inc>
     {2}
     Errorlevel  -219, -302, -306 
@@ -210,14 +224,13 @@ def preobrazovat(event):
         else:                                   # linux variants
             subprocess.call(('xdg-open', filepath))
 
-        #os.system('start {}.asm'.format(path_file[:-4]))
     except KeyError:
         button1['bg'] = 'Red'
 
 
 ass_norm = Tk()
-ass_norm.minsize(width=600, height=250)
-ass_norm.maxsize(width=600, height=250)
+ass_norm.minsize(width=600, height=300)
+ass_norm.maxsize(width=600, height=300)
 ass_norm.title("Читаемый assembler PIC16 новой архитектуры")
 top_frame = Frame(ass_norm)
 top_frame.pack()
@@ -239,23 +252,34 @@ button_open = Button(top_frame, text='Укажите файл mplab', fg='black'
 button_open.grid(row=2, column=1, sticky=S)
 button_open.bind('<Button-1>', openfile)
 label_path_file = Label(
-    top_frame, text='Файл процесссора в формате " .inc " c библиотек MPLAB', fg='blue')
+    top_frame, text='Файл процессора в формате " .inc " c библиотек MPLAB', fg='blue')
 label_path_file.grid(row=3, column=0)
 button_open = Button(top_frame, text='Укажите библиотеку', fg='black')
 button_open.grid(row=3, column=1, sticky=S)
 button_open.bind('<Button-1>', openfilelib)
-
+label_path_file = Label(
+    top_frame, text='Файл процессора в формате " .lkr " c библиотек MPLAB', fg='blue')
+label_path_file.grid(row=4, column=0)
+button_open = Button(top_frame, text='Укажите библиотеку', fg='black')
+button_open.grid(row=4, column=1, sticky=S)
+button_open.bind('<Button-1>', openfile_lkr)
 cvar = BooleanVar()
 cvar.set(1)
 gal = Checkbutton(text='Удаляет отображение пустых строк',
                   variable=cvar, onvalue=1, offvalue=0)
 gal.pack(anchor=W)
 
+old_new = BooleanVar()
+old_new.set(False)
+gal_old_new = Checkbutton(text='Поколение микроконтроллера(Если старый - галочка)',
+                  variable=old_new, onvalue=True, offvalue=False)
+gal_old_new.pack(anchor=W)
+
 label_header = Label(top_frame)
 label_header.grid(row=4)
 
 button1 = Button(top_frame, text='Преобразовать файл', fg='black')
-button1.grid(row=5, column=1, sticky=S)
+button1.grid(row=6, column=1, sticky=S)
 button1.bind('<Button-1>', preobrazovat)
 button1.bind('<Return>', preobrazovat)
 

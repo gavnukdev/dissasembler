@@ -1,3 +1,24 @@
+from math import ceil
+
+def lkr(file):
+
+    file = open(file, 'r')
+    data = file.readlines()
+    for i in range(len(data)):
+        data[i] = ','.join(data[i].split()).split(',')
+    for i in data:
+        if '#ELSE' in i:
+            start_index = data.index(i)
+            break
+    pages = data[start_index+1][1][-1]
+    if pages == 'e':
+        pages = 1
+    else:
+       pages = int(pages) + 1
+    counter_str = int(data[start_index+1][3][4:], 16)
+    size_page = ceil(counter_str / int(pages))
+    return size_page
+
 def lib(file):
 
     file = open(file, 'r')
@@ -9,7 +30,6 @@ def lib(file):
             start_index = data.index(i)
         elif 'STATUS' in i and 'Bits' in i:
             end_index = data.index(i)
-
     new_data = data[start_index:end_index]
     data_rename = [i for i in new_data if len(i) >= 3]
     return data_rename
@@ -57,15 +77,24 @@ def movlp_sort(data, line):
         movlp = '0'*(3-len(movlp))+movlp
     return movlp
 
+dict_bit = {'0x3': 1, '0x4': 2, '0x5': 1, '0x6': 2}
 
-def movlp_2048(data, line, movlp_now):
+def movlp_2048(data, line, movlp_now, movlp=['MOVLP',], size_page=2048, old_new=False):
     movlp_num = movlp_now
-    if data.index(data[line]) % 2048 == 0:
-        movlp_num = str(bin(int(data.index(data[line]) / 2048))[2:])
-    elif 'MOVLP' in data[line]:
-        movlp_num = str(bin(int(str(data[line][2]), 16))[2:-3])
-        if len(movlp_num) <= 3:
-            movlp_num = '0'*(3-len(movlp_num))+movlp_num
+    movlp = ['BCF', 'BSF', 'STATUS', '0x3', '0x4'] if old_new == True else movlp
+    if data.index(data[line]) % size_page == 0:
+        movlp_num = str(bin(int(data.index(data[line]) / size_page))[2:])
+    elif len(list(set(movlp) & set(data[line]))) == 1 and old_new != True:
+            movlp_num = str(bin(int(str(data[line][2]), 16))[2:-3])
+            if len(movlp_num) <= 3:
+                movlp_num = '0'*(3-len(movlp_num))+movlp_num
+    elif len(list(set(movlp) & set(data[line]))) == 3:
+        movlp_num = list(movlp_num)
+        if 'BCF' in data[line]:
+            movlp_num[-dict_bit[data[line][3]]] = '0'
+        elif 'BSF' in data[line]:
+            movlp_num[-dict_bit[data[line][3]]] = '1'
+        movlp_num = ''.join(movlp_num)
     return movlp_num
 
 
@@ -94,7 +123,6 @@ def fix_ram(data, line, register_ram, counter, wich_is_ram):
             else:
                 if data[line][2][:-1] in i:
                     in_general = str(i[0][2:] + ',')
-                    print(in_general)
                     bool_g_ram = True
     if bool_g_ram == False:
         if ',' not in data[line][2]:
@@ -108,3 +136,21 @@ def fix_ram(data, line, register_ram, counter, wich_is_ram):
             in_general = '{}_{},'.format(wich_is_ram, counter)
             counter += 1
     return counter, in_general, register_add
+
+def movlb_calc(data, line, movlb_now, movlb=['MOVLB',], old_new=False):
+    movlb_num = movlb_now
+    movlb = ['BCF', 'BSF', 'STATUS', '0x5', '0x6'] if old_new == True else movlb
+    if len(list(set(movlb) & set(data[line]))) == 3:
+        movlb_num = list(movlb_num / 128)
+        if 'BCF' in data[line] and 'STATUS,' in data[line]:
+            movlb_num[-dict_bit[data[line][3]]] = '0'
+        elif 'BSF' in data[line] and 'STATUS,' in data[line]:
+            movlb_num[-dict_bit[data[line][3]]] = '1'
+        movlb_num = ''.join(movlb_num)
+    elif len(list(set(movlb) & set(data[line]))) == 1 and old_new == False:
+        movlb_num = int(str(data[line][2]), 16) * 128
+    return int(movlb_num)
+
+
+               
+

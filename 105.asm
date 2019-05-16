@@ -1,6 +1,6 @@
-  LIST P=16F1789              
+    LIST P=16F1789              
     #include <P16F1789.inc>
-    __CONFIG 3FEEh
+    __CONFIG h
     Errorlevel  -219, -302, -306 
 ;================================================
 ; GENERAL RAM
