@@ -1,15 +1,23 @@
 import subprocess
 import os
 import platform
+import logging
+import datetime
 from tkinter import *
 from tkinter import ttk, filedialog
 from assam_lib import *
 
+logging.basicConfig(filename='errors_log.log', level=logging.ERROR)
 
 def openfile(event):
     global path_file
     path_file = filedialog.askopenfilename(initialdir='/')
     return path_file
+
+def savefiledir():
+    global save_path
+    save_path = filedialog.askdirectory(initialdir='/')
+    return save_path
 
 def openfilelib(event):
     global mc
@@ -22,7 +30,6 @@ def preobrazovat(event):
 
     try:
         file = open(str(path_file), 'r')
-        file_new = open(str(path_file[:-4])+'.asm', 'w')
         data = file.readlines()
         for i in range(len(data)):
             data[i] = ','.join(data[i].split()).split(',')
@@ -42,7 +49,8 @@ def preobrazovat(event):
         movlp = '000'
         movlb = '00000'
         probar['value'] = 0
-        if old_new.get():
+        old_new = old_or_new(path_file_lib['INC'])
+        if old_new:
             for i in range(len(data)):
                 if len(data[i][0]) != 0:
                     data[i][0] = '0' + str(data[i][0])
@@ -54,8 +62,8 @@ def preobrazovat(event):
         for line in range(len(data)):
             probar['value'] = line
             probar.update()
-            movlp = movlp_2048(data, line, movlp, size_page=lkr(path_file_lib['LKR']), old_new=old_new.get())
-            movlb = movlb_calc(data, line, movlb, old_new=old_new.get())
+            movlp = movlp_2048(data, line, movlp, size_page=lkr(path_file_lib['LKR']), old_new=old_new)
+            movlb = movlb_calc(data, line, movlb, old_new=old_new)
 
             if len(list(set(['RETURN', 'RETFIE', 'RETLW']) & set(data[line]))) != 0:
                 movlp = movlp_sort(data, line)
@@ -177,11 +185,10 @@ def preobrazovat(event):
         data[2][0] = str('ORG 0x0000\n      ')
         data[6][0] = str('ORG 0x0004\n      ')
 
-        if cvar.get() == 1:
-            while 'MOVWI' in data[-1]:
-                for i in data:
-                    if 'MOVWI' in i:
-                        data.remove(i)
+        while 'MOVWI' in data[-1]:
+            for i in data:
+                if 'MOVWI' in i:
+                    data.remove(i)
         name_lib = os.path.basename(path_file_lib['INC'])
         if len(str(config_enter1.get())) > 2 and len(str(config_enter2.get())) > 2:
             conf = '''__CONFIG  _CONFIG1, {0}h
@@ -207,13 +214,14 @@ def preobrazovat(event):
 
         for i in range(len(data)):
             data[i] = ' '.join(data[i]) + '\n'
-
+        save_path = savefiledir()
+        file_new = open(str(save_path + '/' + os.path.basename(path_file)[:-4])+'.asm', 'w')
         file_new.writelines(data)
         file.close()
         file_new.close()
         button1['bg'] = 'lime'
 
-        filepath = '{}.asm'.format(path_file[:-4])
+        filepath = '{}.asm'.format(str(save_path + '/' + os.path.basename(path_file)[:-4]))
         if platform.system() == 'Darwin':       # macOS
             subprocess.call(('open', filepath))
         elif platform.system() == 'Windows':    # Windows
@@ -221,14 +229,15 @@ def preobrazovat(event):
         else:                                   # linux variants
             subprocess.call(('xdg-open', filepath))
 
-    except KeyError:
+    except Exception as e:
+        logging.error('{}: {}'.format(datetime.datetime.now(), e))
         button1['bg'] = 'Red'
 
 
 ass_norm = Tk()
-ass_norm.minsize(width=600, height=320)
-ass_norm.maxsize(width=600, height=320)
-ass_norm.title("Читаемый assembler PIC16 новой архитектуры")
+ass_norm.minsize(width=600, height=260)
+ass_norm.maxsize(width=600, height=260)
+ass_norm.title("Дизассемблер PIC")
 top_frame = Frame(ass_norm)
 top_frame.pack()
 
@@ -255,21 +264,10 @@ button_open = Button(top_frame, text='Укажите библиотеку', fg='
 button_open.grid(row=3, column=1, sticky=S)
 button_open.bind('<Button-1>', openfilelib)
 
-cvar = BooleanVar()
-cvar.set(1)
-gal = Checkbutton(text='Удаляет отображение пустых строк',
-                  variable=cvar, onvalue=1, offvalue=0)
-gal.pack(anchor=W)
-
-old_new = BooleanVar()
-old_new.set(False)
-gal_old_new = Checkbutton(text='Поколение микроконтроллера(Если старый - галочка)',
-                  variable=old_new, onvalue=True, offvalue=False)
-gal_old_new.pack(anchor=W)
-
 label_header = Label(top_frame)
 label_header.grid(row=4)
-
+label_header = Label(top_frame)
+label_header.grid(row=7)
 
 button1 = Button(top_frame, text='Преобразовать файл', fg='black')
 button1.grid(row=6, column=1, sticky=S)

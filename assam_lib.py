@@ -34,6 +34,21 @@ def lib(file):
     data_rename = [i for i in new_data if len(i) >= 3]
     return data_rename
 
+def old_or_new(file):
+    file = open(file, 'r')
+    data = file.readlines()
+    for i in range(len(data)):
+        data[i] = ','.join(data[i].split()).split(',')
+    for i in data:
+        if 'STATUS' in i and 'Bits' in i:
+            start_index = data.index(i)
+        elif 'PORTA' in i and 'Bits' in i:
+            end_index = data.index(i)
+    new_data = data[start_index:end_index]
+    for i in new_data:
+        if len(list(set(['RP0', 'RP1', 'IRP']) & set(i))) > 0:
+            return True
+    return False
 
 def rename_bits(data_rename, bit):
     bits = "H'000{}'".format(bit[-1])
