@@ -8,20 +8,14 @@ from assam_lib import *
 
 def openfile(event):
     global path_file
-    path_file = filedialog.askopenfilename()
+    path_file = filedialog.askopenfilename(initialdir='/')
     return path_file
 
-
 def openfilelib(event):
-    global path_file_lib
-    path_file_lib = filedialog.askopenfilename()
-    return path_file_lib
-
-def openfile_lkr(event):
-    global path_file_lkr
-    path_file_lkr = filedialog.askopenfilename()
-    return path_file_lkr
-
+    global mc
+    path__lib = filedialog.askopenfilename(initialdir='./INC')
+    mc = os.path.basename(path__lib)[1:-4]
+    return mc
 
 def preobrazovat(event):
     global GOTO_INDEX, goto_address, goto, probar
@@ -40,6 +34,9 @@ def preobrazovat(event):
         goto = []
         general_ram = []
         common_ram = []
+        path_file_lib = {}
+        path_file_lib['INC'] = './INC/p' + str(mc) + '.inc'
+        path_file_lib['LKR'] = './LKR/' + str(mc) + '_g.lkr'
         b = 0
         c = 0
         movlp = '000'
@@ -47,17 +44,17 @@ def preobrazovat(event):
         probar['value'] = 0
         if old_new.get():
             for i in range(len(data)):
-                data[i][0] = '0' + str(data[i][0])
+                if len(data[i][0]) != 0:
+                    data[i][0] = '0' + str(data[i][0])
                 if len(data[i + 1]) == 1 and i > 10:
                     end_list = data.index(data[i])
                     data = data[:end_list]
                     break
         probar['maximum'] = len(data)
-
         for line in range(len(data)):
             probar['value'] = line
             probar.update()
-            movlp = movlp_2048(data, line, movlp, size_page=lkr(path_file_lkr), old_new=old_new.get())
+            movlp = movlp_2048(data, line, movlp, size_page=lkr(path_file_lib['LKR']), old_new=old_new.get())
             movlb = movlb_calc(data, line, movlb, old_new=old_new.get())
 
             if len(list(set(['RETURN', 'RETFIE', 'RETLW']) & set(data[line]))) != 0:
@@ -106,13 +103,13 @@ def preobrazovat(event):
                         hex_address = '0' * \
                             (4 - len(hex_tag[2:])) + hex_tag[2:]
                     rename = "H'{}'".format(hex_address.upper())
-                    data_rename = lib(str(path_file_lib))
+                    data_rename = lib(str(path_file_lib['INC']))
                     for i in data_rename:
                         if rename in i:
                             if coma:
                                 data[line][2] = str(i[0]) + ','
                                 data[line][3] = lib_status(
-                                    path_file_lib, data[line][2][:-1], data[line][3])
+                                    path_file_lib['INC'], data[line][2][:-1], data[line][3])
                                 break
                             else:
                                 data[line][2] = str(i[0])
@@ -173,7 +170,7 @@ def preobrazovat(event):
                     data[i][0] += '\n'
                     data[i][1] = ' ' * 6 + data[i][1]
 
-        for page in range(lkr(path_file_lkr) + 2, len(data), lkr(path_file_lkr) + 1):
+        for page in range(lkr(path_file_lib['LKR']) + 2, len(data), lkr(path_file_lib['LKR']) + 1):
             data.insert(page, [
                         ';=======================================\n'+str('ORG 0x' + data[page][0][2:])])
 
@@ -185,7 +182,7 @@ def preobrazovat(event):
                 for i in data:
                     if 'MOVWI' in i:
                         data.remove(i)
-        name_lib = os.path.basename(path_file_lib)
+        name_lib = os.path.basename(path_file_lib['INC'])
         if len(str(config_enter1.get())) > 2 and len(str(config_enter2.get())) > 2:
             conf = '''__CONFIG  _CONFIG1, {0}h
     __CONFIG    _CONFIG2, {1}h'''.format(str(config_enter1.get()).upper(), str(config_enter2.get()).upper())
@@ -229,8 +226,8 @@ def preobrazovat(event):
 
 
 ass_norm = Tk()
-ass_norm.minsize(width=600, height=300)
-ass_norm.maxsize(width=600, height=300)
+ass_norm.minsize(width=600, height=320)
+ass_norm.maxsize(width=600, height=320)
 ass_norm.title("Читаемый assembler PIC16 новой архитектуры")
 top_frame = Frame(ass_norm)
 top_frame.pack()
@@ -257,12 +254,7 @@ label_path_file.grid(row=3, column=0)
 button_open = Button(top_frame, text='Укажите библиотеку', fg='black')
 button_open.grid(row=3, column=1, sticky=S)
 button_open.bind('<Button-1>', openfilelib)
-label_path_file = Label(
-    top_frame, text='Файл процессора в формате " .lkr " c библиотек MPLAB', fg='blue')
-label_path_file.grid(row=4, column=0)
-button_open = Button(top_frame, text='Укажите библиотеку', fg='black')
-button_open.grid(row=4, column=1, sticky=S)
-button_open.bind('<Button-1>', openfile_lkr)
+
 cvar = BooleanVar()
 cvar.set(1)
 gal = Checkbutton(text='Удаляет отображение пустых строк',
@@ -277,6 +269,7 @@ gal_old_new.pack(anchor=W)
 
 label_header = Label(top_frame)
 label_header.grid(row=4)
+
 
 button1 = Button(top_frame, text='Преобразовать файл', fg='black')
 button1.grid(row=6, column=1, sticky=S)

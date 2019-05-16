@@ -81,7 +81,7 @@ dict_bit = {'0x3': 1, '0x4': 2, '0x5': 1, '0x6': 2}
 
 def movlp_2048(data, line, movlp_now, movlp=['MOVLP',], size_page=2048, old_new=False):
     movlp_num = movlp_now
-    movlp = ['BCF', 'BSF', 'STATUS', '0x3', '0x4'] if old_new == True else movlp
+    movlp = ['BCF', 'BSF', 'PCLATH', '0x3', '0x4'] if old_new == True else movlp
     if data.index(data[line]) % size_page == 0:
         movlp_num = str(bin(int(data.index(data[line]) / size_page))[2:])
     elif len(list(set(movlp) & set(data[line]))) == 1 and old_new != True:

@@ -1,6 +1,6 @@
     LIST P=16F690              
     #include <P16F690.inc>
-    __CONFIG h
+    __CONFIG 3232h
     Errorlevel  -219, -302, -306 
 ;================================================
 ; GENERAL RAM
@@ -38,7 +38,7 @@
   C.RAM_5 EQU 0x74
   C.RAM_6 EQU 0x71
 ;================================================
-0
+
 ORG 0x0000
        CLRF STATUS
        GOTO L_019F              ; 0x19f

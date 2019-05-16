@@ -1,0 +1,12 @@
+// File: eeprom16.lkr
+// Generic linker script for the EEPROM16 processor
+
+LIBPATH .
+
+
+CODEPAGE   NAME=page       START=0x0               END=0x45                     
+CODEPAGE   NAME=.config    START=0x2007            END=0x2007         PROTECTED 
+
+
+
+

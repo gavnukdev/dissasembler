@@ -1,10 +1,9 @@
         LIST
 
 ;==========================================================================
-; Build date : Nov 22 2017
 ;  MPASM PIC16F1789 processor include
 ; 
-;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
+;  (c) Copyright 1999-2013 Microchip Technology, All rights reserved
 ;==========================================================================
 
         NOLIST
@@ -184,9 +183,7 @@ SSPMSK           EQU  H'0213'
 SSP1STAT         EQU  H'0214'
 SSPSTAT          EQU  H'0214'
 SSP1CON          EQU  H'0215'
-SSP1CON1         EQU  H'0215'
 SSPCON           EQU  H'0215'
-SSPCON1          EQU  H'0215'
 SSP1CON2         EQU  H'0216'
 SSPCON2          EQU  H'0216'
 SSP1CON3         EQU  H'0217'
@@ -246,13 +243,10 @@ CLKRCON          EQU  H'051A'
 ;-----Bank11------------------
 DAC2CON0         EQU  H'0591'
 DAC2CON1         EQU  H'0592'
-DAC2REF          EQU  H'0592'
 DAC3CON0         EQU  H'0593'
 DAC3CON1         EQU  H'0594'
-DAC3REF          EQU  H'0594'
 DAC4CON0         EQU  H'0595'
 DAC4CON1         EQU  H'0596'
-DAC4REF          EQU  H'0596'
 
 ;-----Bank29------------------
 PSMC1CON         EQU  H'0E91'
@@ -658,10 +652,8 @@ PSMC3SIE         EQU  H'0002'
 PSMC4SIE         EQU  H'0003'
 PSMC1TIE         EQU  H'0004'
 PSMC2TIE         EQU  H'0005'
-PSMC3TIE         EQU  H'0006'
-PSMC4TIE         EQU  H'0007'
-
 PMSC3TIE         EQU  H'0006'
+PSMC4TIE         EQU  H'0007'
 
 
 ;----- OPTION_REG Bits -----------------------------------------------------
@@ -889,8 +881,6 @@ ADFVR0           EQU  H'0000'
 ADFVR1           EQU  H'0001'
 CDAFVR0          EQU  H'0002'
 CDAFVR1          EQU  H'0003'
-TSRNG            EQU  H'0004'
-TSEN             EQU  H'0005'
 FVRRDY           EQU  H'0006'
 FVREN            EQU  H'0007'
 
@@ -1412,31 +1402,7 @@ SSPM2            EQU  H'0002'
 SSPM3            EQU  H'0003'
 
 
-;----- SSP1CON1 Bits -----------------------------------------------------
-CKP              EQU  H'0004'
-SSPEN            EQU  H'0005'
-SSPOV            EQU  H'0006'
-WCOL             EQU  H'0007'
-
-SSPM0            EQU  H'0000'
-SSPM1            EQU  H'0001'
-SSPM2            EQU  H'0002'
-SSPM3            EQU  H'0003'
-
-
 ;----- SSPCON Bits -----------------------------------------------------
-CKP              EQU  H'0004'
-SSPEN            EQU  H'0005'
-SSPOV            EQU  H'0006'
-WCOL             EQU  H'0007'
-
-SSPM0            EQU  H'0000'
-SSPM1            EQU  H'0001'
-SSPM2            EQU  H'0002'
-SSPM3            EQU  H'0003'
-
-
-;----- SSPCON1 Bits -----------------------------------------------------
 CKP              EQU  H'0004'
 SSPEN            EQU  H'0005'
 SSPOV            EQU  H'0006'
@@ -1813,13 +1779,6 @@ OPA1PCH2         EQU  H'0002'
 OPA1SP           EQU  H'0006'
 OPA1EN           EQU  H'0007'
 
-SP               EQU  H'0006'
-EN               EQU  H'0007'
-
-PCH0             EQU  H'0000'
-PCH1             EQU  H'0001'
-PCH2             EQU  H'0002'
-
 
 ;----- OPA2CON Bits -----------------------------------------------------
 OPA2PCH0         EQU  H'0000'
@@ -1829,13 +1788,6 @@ OPA2PCH2         EQU  H'0002'
 OPA2SP           EQU  H'0006'
 OPA2EN           EQU  H'0007'
 
-SP               EQU  H'0006'
-EN               EQU  H'0007'
-
-PCH0             EQU  H'0000'
-PCH1             EQU  H'0001'
-PCH2             EQU  H'0002'
-
 
 ;----- OPA3CON Bits -----------------------------------------------------
 OPA3PCH0         EQU  H'0000'
@@ -1844,13 +1796,6 @@ OPA3PCH2         EQU  H'0002'
 
 OPA3SP           EQU  H'0006'
 OPA3EN           EQU  H'0007'
-
-SP               EQU  H'0006'
-EN               EQU  H'0007'
-
-PCH0             EQU  H'0000'
-PCH1             EQU  H'0001'
-PCH2             EQU  H'0002'
 
 
 ;----- CLKRCON Bits -----------------------------------------------------
@@ -3113,73 +3058,73 @@ Z_SHAD           EQU  H'0002'
 
 ; The following is an assignment of address values for all of the
 ; configuration registers for the purpose of table reads
-_CONFIG1        EQU  H'8007'
-_CONFIG2        EQU  H'8008'
+_CONFIG1         EQU  H'8007'
+_CONFIG2         EQU  H'8008'
 
 ;----- CONFIG1 Options --------------------------------------------------
-_FOSC_LP             EQU  H'3FF8'; LP Oscillator, Low-power crystal connected between OSC1 and OSC2 pins
-_FOSC_XT             EQU  H'3FF9'; XT Oscillator, Crystal/resonator connected between OSC1 and OSC2 pins
-_FOSC_HS             EQU  H'3FFA'; HS Oscillator, High-speed crystal/resonator connected between OSC1 and OSC2 pins
-_FOSC_EXTRC          EQU  H'3FFB'; EXTRC oscillator: External RC circuit connected to CLKIN pin
-_FOSC_INTOSC         EQU  H'3FFC'; INTOSC oscillator: I/O function on CLKIN pin
-_FOSC_ECL            EQU  H'3FFD'; ECL, External Clock, Low Power Mode (0-0.5 MHz): device clock supplied to CLKIN pin
-_FOSC_ECM            EQU  H'3FFE'; ECM, External Clock, Medium Power Mode (0.5-4 MHz): device clock supplied to CLKIN pin
-_FOSC_ECH            EQU  H'3FFF'; ECH, External Clock, High Power Mode (4-32 MHz): device clock supplied to CLKIN pin
+_FOSC_LP         EQU  H'FFF8'    ; LP Oscillator, Low-power crystal connected between OSC1 and OSC2 pins
+_FOSC_XT         EQU  H'FFF9'    ; XT Oscillator, Crystal/resonator connected between OSC1 and OSC2 pins
+_FOSC_HS         EQU  H'FFFA'    ; HS Oscillator, High-speed crystal/resonator connected between OSC1 and OSC2 pins
+_FOSC_EXTRC      EQU  H'FFFB'    ; EXTRC oscillator: External RC circuit connected to CLKIN pin
+_FOSC_INTOSC     EQU  H'FFFC'    ; INTOSC oscillator: I/O function on CLKIN pin
+_FOSC_ECL        EQU  H'FFFD'    ; ECL, External Clock, Low Power Mode (0-0.5 MHz): device clock supplied to CLKIN pin
+_FOSC_ECM        EQU  H'FFFE'    ; ECM, External Clock, Medium Power Mode (0.5-4 MHz): device clock supplied to CLKIN pin
+_FOSC_ECH        EQU  H'FFFF'    ; ECH, External Clock, High Power Mode (4-32 MHz): device clock supplied to CLKIN pin
 
-_WDTE_OFF            EQU  H'3FE7'; WDT disabled
-_WDTE_SWDTEN         EQU  H'3FEF'; WDT controlled by the SWDTEN bit in the WDTCON register
-_WDTE_NSLEEP         EQU  H'3FF7'; WDT enabled while running and disabled in Sleep
-_WDTE_ON             EQU  H'3FFF'; WDT enabled
+_WDTE_OFF        EQU  H'FFE7'    ; WDT disabled
+_WDTE_SWDTEN     EQU  H'FFEF'    ; WDT controlled by the SWDTEN bit in the WDTCON register
+_WDTE_NSLEEP     EQU  H'FFF7'    ; WDT enabled while running and disabled in Sleep
+_WDTE_ON         EQU  H'FFFF'    ; WDT enabled
 
-_PWRTE_ON            EQU  H'3FDF'; PWRT enabled
-_PWRTE_OFF           EQU  H'3FFF'; PWRT disabled
+_PWRTE_ON        EQU  H'FFDF'    ; PWRT enabled
+_PWRTE_OFF       EQU  H'FFFF'    ; PWRT disabled
 
-_MCLRE_OFF           EQU  H'3FBF'; MCLR/VPP pin function is digital input
-_MCLRE_ON            EQU  H'3FFF'; MCLR/VPP pin function is MCLR
+_MCLRE_OFF       EQU  H'FFBF'    ; MCLR/VPP pin function is digital input
+_MCLRE_ON        EQU  H'FFFF'    ; MCLR/VPP pin function is MCLR
 
-_CP_ON               EQU  H'3F7F'; Program memory code protection is enabled
-_CP_OFF              EQU  H'3FFF'; Program memory code protection is disabled
+_CP_ON           EQU  H'FF7F'    ; Program memory code protection is enabled
+_CP_OFF          EQU  H'FFFF'    ; Program memory code protection is disabled
 
-_CPD_ON              EQU  H'3EFF'; Data memory code protection is enabled
-_CPD_OFF             EQU  H'3FFF'; Data memory code protection is disabled
+_CPD_ON          EQU  H'FEFF'    ; Data memory code protection is enabled
+_CPD_OFF         EQU  H'FFFF'    ; Data memory code protection is disabled
 
-_BOREN_OFF           EQU  H'39FF'; Brown-out Reset disabled
-_BOREN_SBODEN        EQU  H'3BFF'; Brown-out Reset controlled by the SBOREN bit in the BORCON register
-_BOREN_NSLEEP        EQU  H'3DFF'; Brown-out Reset enabled while running and disabled in Sleep
-_BOREN_ON            EQU  H'3FFF'; Brown-out Reset enabled
+_BOREN_OFF       EQU  H'F9FF'    ; Brown-out Reset disabled
+_BOREN_SBODEN    EQU  H'FBFF'    ; Brown-out Reset controlled by the SBOREN bit in the BORCON register
+_BOREN_NSLEEP    EQU  H'FDFF'    ; Brown-out Reset enabled while running and disabled in Sleep
+_BOREN_ON        EQU  H'FFFF'    ; Brown-out Reset enabled
 
-_CLKOUTEN_ON         EQU  H'37FF'; CLKOUT function is enabled on the CLKOUT pin
-_CLKOUTEN_OFF        EQU  H'3FFF'; CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin
+_CLKOUTEN_ON     EQU  H'F7FF'    ; CLKOUT function is enabled on the CLKOUT pin
+_CLKOUTEN_OFF    EQU  H'FFFF'    ; CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin
 
-_IESO_OFF            EQU  H'2FFF'; Internal/External Switchover mode is disabled
-_IESO_ON             EQU  H'3FFF'; Internal/External Switchover mode is enabled
+_IESO_OFF        EQU  H'EFFF'    ; Internal/External Switchover mode is disabled
+_IESO_ON         EQU  H'FFFF'    ; Internal/External Switchover mode is enabled
 
-_FCMEN_OFF           EQU  H'1FFF'; Fail-Safe Clock Monitor is disabled
-_FCMEN_ON            EQU  H'3FFF'; Fail-Safe Clock Monitor is enabled
+_FCMEN_OFF       EQU  H'DFFF'    ; Fail-Safe Clock Monitor is disabled
+_FCMEN_ON        EQU  H'FFFF'    ; Fail-Safe Clock Monitor is enabled
 
 ;----- CONFIG2 Options --------------------------------------------------
-_WRT_ALL             EQU  H'3FFC'; 000h to 7FFh write protected, no addresses may be modified by EECON control
-_WRT_HALF            EQU  H'3FFD'; 000h to FFFh write protected, 1000h to 1FFFh may be modified by EECON control
-_WRT_BOOT            EQU  H'3FFE'; 000h to 1FFh write protected, 200h to 1FFFh may be modified by EECON control
-_WRT_OFF             EQU  H'3FFF'; Write protection off
+_WRT_ALL         EQU  H'FFFC'    ; 000h to 7FFh write protected, no addresses may be modified by EECON control
+_WRT_HALF        EQU  H'FFFD'    ; 000h to FFFh write protected, 1000h to 1FFFh may be modified by EECON control
+_WRT_BOOT        EQU  H'FFFE'    ; 000h to 1FFh write protected, 200h to 1FFFh may be modified by EECON control
+_WRT_OFF         EQU  H'FFFF'    ; Write protection off
 
-_VCAPEN_ON           EQU  H'3FDF'; Vcap functionality is enabled on RA6 (Vddcore is connected to the pad)
-_VCAPEN_OFF          EQU  H'3FFF'; Vcap functionality is disabled on RA6.
+_VCAPEN_ON       EQU  H'FFDF'    ; Vcap functionality is enabled on RA6 (Vddcore is connected to the pad)
+_VCAPEN_OFF      EQU  H'FFFF'    ; Vcap functionality is disabled on RA6.
 
-_PLLEN_OFF           EQU  H'3EFF'; 4x PLL disabled
-_PLLEN_ON            EQU  H'3FFF'; 4x PLL enabled
+_PLLEN_OFF       EQU  H'FEFF'    ; 4x PLL disabled
+_PLLEN_ON        EQU  H'FFFF'    ; 4x PLL enabled
 
-_STVREN_OFF          EQU  H'3DFF'; Stack Overflow or Underflow will not cause a Reset
-_STVREN_ON           EQU  H'3FFF'; Stack Overflow or Underflow will cause a Reset
+_STVREN_OFF      EQU  H'FDFF'    ; Stack Overflow or Underflow will not cause a Reset
+_STVREN_ON       EQU  H'FFFF'    ; Stack Overflow or Underflow will cause a Reset
 
-_BORV_HI             EQU  H'3BFF'; Brown-out Reset Voltage (Vbor), high trip point selected.
-_BORV_LO             EQU  H'3FFF'; Brown-out Reset Voltage (Vbor), low trip point selected.
+_BORV_HI         EQU  H'FBFF'    ; Brown-out Reset Voltage (Vbor), high trip point selected.
+_BORV_LO         EQU  H'FFFF'    ; Brown-out Reset Voltage (Vbor), low trip point selected.
 
-_LPBOR_ON            EQU  H'37FF'; Low power brown-out is enabled
-_LPBOR_OFF           EQU  H'3FFF'; Low power brown-out is disabled
+_LPBOR_ON        EQU  H'F7FF'    ; Low power brown-out is enabled
+_LPBOR_OFF       EQU  H'FFFF'    ; Low power brown-out is disabled
 
-_LVP_OFF             EQU  H'1FFF'; High-voltage on MCLR/VPP must be used for programming
-_LVP_ON              EQU  H'3FFF'; Low-voltage programming enabled
+_LVP_OFF         EQU  H'DFFF'    ; High-voltage on MCLR/VPP must be used for programming
+_LVP_ON          EQU  H'FFFF'    ; Low-voltage programming enabled
 
 ;----- DEVID Equates --------------------------------------------------
 _DEVID1          EQU  H'8006'
